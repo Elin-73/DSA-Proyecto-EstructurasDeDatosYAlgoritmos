@@ -1,30 +1,28 @@
+import sys
+
+from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton
 from estructuras import Stack, Queue
 
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("My App")
+        button = QPushButton("Press Me!")
+
+        # Set the central widget of the Window.
+        self.setCentralWidget(button)
+
+
 def main() -> None:
-  myStack = Stack()
-  myStack.push('A')
-  myStack.push('B')
-  myStack.push('C')
+  app = QApplication(sys.argv)
 
-  print("Pop: ", myStack.pop())
-  print("Peek: ", myStack.peek())
-  print("isEmpty: ", myStack.isEmpty())
-  print("Size: ", myStack.stackSize())
+  window = MainWindow()
+  window.show()
 
-  myQueue = Queue()
-
-  myQueue.enqueue('A')
-  myQueue.enqueue('B')
-  myQueue.enqueue('C')
-  print("Queue: ", myQueue.queue)
-
-  print("Dequeue: ", myQueue.dequeue())
-
-  print("Peek: ", myQueue.peek())
-
-  print("isEmpty: ", myQueue.isEmpty())
-
-  print("Size: ", myQueue.size())
+  app.exec()
 
 if __name__ == "__main__":
   main()
