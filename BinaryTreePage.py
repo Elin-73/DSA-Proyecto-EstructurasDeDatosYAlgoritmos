@@ -1,17 +1,7 @@
-import sys
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                            QHBoxLayout, QPushButton, QStackedWidget, QLabel,
-                            QTextEdit, QLineEdit, QMessageBox, QScrollArea)
-from PyQt6.QtCore import Qt, QPoint
-from PyQt6.QtGui import QFont, QPainter, QPen, QBrush, QColor
-
-from GraphPage import *
-from BinaryTreePage import *
-from LinkedListPage import *
-from ArrayPage import *
-from QueuePage import *
-from StackPage import *
-from SideBar import *
+from PyQt6.QtWidgets import (QWidget, QVBoxLayout, 
+                            QHBoxLayout, QPushButton, QLabel,
+                            QTextEdit, QLineEdit)
+from PyQt6.QtGui import QFont
 
 class BinaryTreePage(QWidget):
     def __init__(self):

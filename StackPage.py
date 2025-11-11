@@ -1,9 +1,7 @@
-import sys
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                            QHBoxLayout, QPushButton, QStackedWidget, QLabel,
-                            QTextEdit, QLineEdit, QMessageBox, QScrollArea)
-from PyQt6.QtCore import Qt, QPoint
-from PyQt6.QtGui import QFont, QPainter, QPen, QBrush, QColor
+from PyQt6.QtWidgets import (QWidget, QVBoxLayout, 
+                            QHBoxLayout, QPushButton,
+                            QLabel, QTextEdit, QLineEdit)
+from PyQt6.QtGui import QFont
 
 from GraphPage import *
 from BinaryTreePage import *
