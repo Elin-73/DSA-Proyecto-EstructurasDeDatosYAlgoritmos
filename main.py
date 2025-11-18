@@ -1,28 +1,12 @@
-import sys
+from MainWindow import *
+from PyQt6.QtWidgets import QApplication
 
-from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton
-from estructuras import Stack, Queue
-
-
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-
-        self.setWindowTitle("My App")
-        button = QPushButton("Press Me!")
-
-        # Set the central widget of the Window.
-        self.setCentralWidget(button)
-
-
-def main() -> None:
-  app = QApplication(sys.argv)
-
-  window = MainWindow()
-  window.show()
-
-  app.exec()
+# Import your data structure classes here
+# Example:
+# from your_file import Stack, Queue, Array, CircularLinkedList, BinaryTree, Graph
 
 if __name__ == "__main__":
-  main()
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())

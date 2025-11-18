@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, 
                             QHBoxLayout, QPushButton, QLabel,
-                            QTextEdit, QLineEdit)
+                            QTextEdit, QLineEdit, QMessageBox)
 from PyQt6.QtGui import QFont
 
 from GraphPage import *
@@ -11,11 +11,12 @@ from QueuePage import *
 from StackPage import *
 from SideBar import *
 
+from Estructuras import Queue
+
 class QueuePage(QWidget):
     def __init__(self):
         super().__init__()
-        # Initialize your Queue class here
-        # self.queue = Queue()
+        self.queue = Queue()
         
         layout = QVBoxLayout()
         
@@ -68,11 +69,17 @@ class QueuePage(QWidget):
     def enqueue(self):
         value = self.queue_input.text().strip()
         if value:
-            # self.queue.enqueue(value)
+            self.queue.enqueue(value)
             self.queue_input.clear()
             self.update_display()
     
     def dequeue(self):
+        return_value = self.queue.dequeue()
+        if return_value == "Queue is empty":
+            QMessageBox.warning(self, "Empty Queue", "Queue is empty!")
+        else:
+            QMessageBox.information(self, "Dequeued", f"Removed value: {return_value}")
+            self.update_display()
         # if not self.queue.is_empty():
         #     removed = self.queue.dequeue()
         #     QMessageBox.information(self, "Dequeued", f"Removed value: {removed}")
@@ -82,6 +89,12 @@ class QueuePage(QWidget):
         pass
     
     def peek_front(self):
+        return_value = self.queue.peek()
+        if return_value == "Queue is empty":
+            QMessageBox.warning(self, "Empty Queue", "Queue is empty!")
+        else:
+            QMessageBox.information(self, "Front", f"Front value: {return_value}")
+            self.update_display()
         # if not self.queue.is_empty():
         #     front = self.queue.front()
         #     QMessageBox.information(self, "Front", f"Front value: {front}")
@@ -90,5 +103,5 @@ class QueuePage(QWidget):
         pass
     
     def update_display(self):
-        display = "FRONT → [Item1] ← [Item2] ← [Item3] ← REAR"
+        display = self.queue.toList()
         self.queue_display.setText(display)

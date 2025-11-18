@@ -11,11 +11,13 @@ from QueuePage import *
 from StackPage import *
 from SideBar import *
 
+from Estructuras import CircularList
+
 class CircularLinkedListPage(QWidget):
     def __init__(self):
         super().__init__()
         # Initialize your CircularLinkedList class here
-        # self.cll = CircularLinkedList()
+        self.cll = CircularList()
         
         layout = QVBoxLayout()
         
@@ -73,6 +75,7 @@ class CircularLinkedListPage(QWidget):
             self.update_display()
     
     def delete_node(self):
+        removed = self.cll.pop()
         # if not self.cll.is_empty():
         #     removed = self.cll.delete_first()
         #     QMessageBox.information(self, "Deleted", f"Deleted node: {removed}")

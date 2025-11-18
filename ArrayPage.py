@@ -17,7 +17,7 @@ class ArrayPage(QWidget):
     def __init__(self):
         super().__init__()
         # Initialize your Array class here
-        # self.array = Array()
+        self.array = []
         
         layout = QVBoxLayout()
         
@@ -75,7 +75,7 @@ class ArrayPage(QWidget):
     def add_element(self):
         value = self.array_input.text().strip()
         if value:
-            # self.array.append(value)
+            #Array.append(value)
             self.array_input.clear()
             self.update_display()
     
