@@ -1,12 +1,4 @@
-from PyQt6.QtWidgets import (QPushButton)
-
-from GraphPage import *
-from BinaryTreePage import *
-from LinkedListPage import *
-from ArrayPage import *
-from QueuePage import *
-from StackPage import *
-from SideBar import *
+from PyQt6.QtWidgets import QPushButton
 
 class SidebarButton(QPushButton):
     def __init__(self, text, parent=None):

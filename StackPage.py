@@ -3,21 +3,11 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout,
                             QLabel, QTextEdit, QLineEdit, QMessageBox)
 from PyQt6.QtGui import QFont
 
-from GraphPage import *
-from BinaryTreePage import *
-from LinkedListPage import *
-from ArrayPage import *
-from QueuePage import *
-from StackPage import *
-from SideBar import *
-
 from Estructuras import Stack
 
 class StackPage(QWidget):
     def __init__(self):
         super().__init__()
-        # Initialize your Stack class here
-        # self.stack = Stack()
         self.stack = Stack()
         
         layout = QVBoxLayout()
@@ -71,12 +61,9 @@ class StackPage(QWidget):
     def push_stack(self):
         value = self.stack_input.text().strip()
         if value:
-            # Call your stack's push method
-            # self.stack.push(value)
             self.stack.push(value)
             self.stack_input.clear()
             self.update_display()
-            
     
     def pop_stack(self):
         value = self.stack.pop()
@@ -85,14 +72,6 @@ class StackPage(QWidget):
         else:
             QMessageBox.information(self, "Popped", f"Popped value: {value}")
             self.update_display()
-        # Call your stack's pop method
-        # if not self.stack.is_empty():
-        #     popped = self.stack.pop()
-        #     QMessageBox.information(self, "Popped", f"Popped value: {popped}")
-        #     self.update_display()
-        # else:
-        #     QMessageBox.warning(self, "Empty Stack", "Stack is empty!")
-        pass
     
     def peek_stack(self):
         value = self.stack.peek()
@@ -100,21 +79,12 @@ class StackPage(QWidget):
             QMessageBox.warning(self, "Empty Stack", "Stack is empty!")
         else:
             QMessageBox.information(self, "Peek", f"Top value: {value}")
-        # Call your stack's peek method
-        # if not self.stack.is_empty():
-        #     top = self.stack.peek()
-        #     QMessageBox.information(self, "Peek", f"Top value: {top}")
-        # else:
-        #     QMessageBox.warning(self, "Empty Stack", "Stack is empty!")
-        pass
     
     def update_display(self):
-        # Get the stack data and visualize it
         stack_list = self.stack.toList()
         
         display = "Stack visualization:\n"
         display += stack_list
         
         self.stack_display.setText(display)
-        # Update info: self.stack_info.setText(f"Size: {self.stack.size()} | Top: {self.stack.peek() if not self.stack.is_empty() else 'None'}")
         self.stack_info.setText(f"Size: {self.stack.size()} | Top: {self.stack.peek() if not self.stack.isEmpty() else 'None'}")

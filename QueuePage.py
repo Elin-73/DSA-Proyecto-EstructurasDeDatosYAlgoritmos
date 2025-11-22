@@ -3,14 +3,6 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout,
                             QTextEdit, QLineEdit, QMessageBox)
 from PyQt6.QtGui import QFont
 
-from GraphPage import *
-from BinaryTreePage import *
-from LinkedListPage import *
-from ArrayPage import *
-from QueuePage import *
-from StackPage import *
-from SideBar import *
-
 from Estructuras import Queue
 
 class QueuePage(QWidget):
@@ -46,7 +38,7 @@ class QueuePage(QWidget):
         
         front_btn = QPushButton("Front")
         front_btn.clicked.connect(self.peek_front)
-        front_btn.setStyleSheet("background-color: #3498db; color: white; padding: 10px;")
+        front_btn.setStyleSheet("background-color: #3498db; color: white; padding: 8px;")
         input_layout.addWidget(front_btn)
         
         layout.addLayout(input_layout)
@@ -80,13 +72,6 @@ class QueuePage(QWidget):
         else:
             QMessageBox.information(self, "Dequeued", f"Removed value: {return_value}")
             self.update_display()
-        # if not self.queue.is_empty():
-        #     removed = self.queue.dequeue()
-        #     QMessageBox.information(self, "Dequeued", f"Removed value: {removed}")
-        #     self.update_display()
-        # else:
-        #     QMessageBox.warning(self, "Empty Queue", "Queue is empty!")
-        pass
     
     def peek_front(self):
         return_value = self.queue.peek()
@@ -94,14 +79,8 @@ class QueuePage(QWidget):
             QMessageBox.warning(self, "Empty Queue", "Queue is empty!")
         else:
             QMessageBox.information(self, "Front", f"Front value: {return_value}")
-            self.update_display()
-        # if not self.queue.is_empty():
-        #     front = self.queue.front()
-        #     QMessageBox.information(self, "Front", f"Front value: {front}")
-        # else:
-        #     QMessageBox.warning(self, "Empty Queue", "Queue is empty!")
-        pass
     
     def update_display(self):
         display = self.queue.toList()
         self.queue_display.setText(display)
+        self.queue_info.setText(f"Size: {self.queue.size()}")

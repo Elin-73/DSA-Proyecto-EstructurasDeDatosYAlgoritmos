@@ -2,13 +2,14 @@ import sys
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, 
                             QHBoxLayout, QStackedWidget, QLabel)
 
+from SideBar import SidebarButton
+from StackPage import StackPage
+from QueuePage import QueuePage
+from ArrayPage import ArrayPage
+from LinkedListPage import CircularLinkedListPage
+from BinaryTreePage import BinaryTreePage
 from GraphPage import GraphPage
-from BinaryTreePage import *
-from LinkedListPage import *
-from ArrayPage import *
-from QueuePage import *
-from StackPage import *
-from SideBar import *
+
 
 class MainWindow(QMainWindow):
     def __init__(self):

@@ -1,22 +1,13 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, 
                             QHBoxLayout, QPushButton, QLabel,
-                            QTextEdit, QLineEdit)
+                            QTextEdit, QLineEdit, QMessageBox)
 from PyQt6.QtGui import QFont
-
-from GraphPage import *
-from BinaryTreePage import *
-from LinkedListPage import *
-from ArrayPage import *
-from QueuePage import *
-from StackPage import *
-from SideBar import *
 
 from Estructuras import CircularList
 
 class CircularLinkedListPage(QWidget):
     def __init__(self):
         super().__init__()
-        # Initialize your CircularLinkedList class here
         self.cll = CircularList()
         
         layout = QVBoxLayout()
@@ -47,7 +38,7 @@ class CircularLinkedListPage(QWidget):
         
         traverse_btn = QPushButton("Traverse")
         traverse_btn.clicked.connect(self.traverse)
-        traverse_btn.setStyleSheet("background-color: #3498db; color: white; padding: 10px;")
+        traverse_btn.setStyleSheet("background-color: #3498db; color: white; padding: 8px;")
         input_layout.addWidget(traverse_btn)
         
         layout.addLayout(input_layout)
@@ -70,28 +61,24 @@ class CircularLinkedListPage(QWidget):
     def add_node(self):
         value = self.cll_input.text().strip()
         if value:
-            # self.cll.add(value)
+            self.cll.push(value)
             self.cll_input.clear()
             self.update_display()
     
     def delete_node(self):
         removed = self.cll.pop()
-        # if not self.cll.is_empty():
-        #     removed = self.cll.delete_first()
-        #     QMessageBox.information(self, "Deleted", f"Deleted node: {removed}")
-        #     self.update_display()
-        # else:
-        #     QMessageBox.warning(self, "Empty List", "List is empty!")
-        pass
+        if removed == "List is Empty!":
+            QMessageBox.warning(self, "Empty List", "List is empty!")
+        else:
+            QMessageBox.information(self, "Deleted", f"Deleted node: {removed}")
+            self.update_display()
     
     def traverse(self):
-        # if not self.cll.is_empty():
-        #     traversal = self.cll.traverse()
-        #     QMessageBox.information(self, "Traversal", traversal)
-        # else:
-        #     QMessageBox.warning(self, "Empty List", "List is empty!")
-        pass
+        # Implement traverse display if your CircularList has a method
+        QMessageBox.information(self, "Traverse", "Traversal feature coming soon!")
     
     def update_display(self):
+        # You'll need to implement a display method in your CircularList class
         display = "[Node1] → [Node2] → [Node3] → [back to Node1] ↻"
         self.cll_display.setText(display)
+        self.cll_info.setText(f"Size: {self.cll.size}")

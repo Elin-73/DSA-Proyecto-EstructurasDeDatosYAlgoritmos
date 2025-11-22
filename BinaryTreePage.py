@@ -11,46 +11,39 @@ from Estructuras import Tree
 class BinaryTreeCanvas(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setMinimumSize(1000, 600)  # Larger canvas
+        self.setMinimumSize(1000, 600)
         self.tree_nodes = []
         self.positions = {}
         
     def set_tree_data(self, nodes):
-        """Set tree data. Expected format: list of node values in level-order"""
         self.tree_nodes = nodes
         self.calculate_positions()
         self.update()
     
     def calculate_positions(self):
-        """Calculate positions for all nodes to prevent overlap"""
         if not self.tree_nodes:
             return
         
         self.positions = {}
         max_level = self._calculate_level(len(self.tree_nodes) - 1)
         
-        # Tighter spacing
         max_nodes_at_bottom = 2 ** max_level
-        h_spacing = max(50, self.width() // (max_nodes_at_bottom + 1))  # Reduced from 80
+        h_spacing = max(50, self.width() // (max_nodes_at_bottom + 1))
         
         for i, node_value in enumerate(self.tree_nodes):
             if node_value is None:
                 continue
             
             level = self._calculate_level(i)
-            
-            # Calculate x position using in-order positioning
             x = self._calculate_x_position(i, h_spacing, max_level)
-            y = 40 + level * 60  # Reduced vertical spacing from 80 to 60
+            y = 40 + level * 60
             
             self.positions[i] = (x, y)
     
     def _calculate_x_position(self, index, h_spacing, max_level):
-        """Calculate x position to prevent node overlap"""
         level = self._calculate_level(index)
         pos_in_level = index - (2**level - 1)
         
-        # Calculate offset for centering
         nodes_at_level = 2 ** level
         total_width = self.width()
         spacing = total_width // (nodes_at_level + 1)
@@ -67,7 +60,7 @@ class BinaryTreeCanvas(QWidget):
             painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "Tree is empty")
             return
         
-        node_radius = 18  # Reduced from 25 to 18
+        node_radius = 18
         
         # Draw edges first
         for i, node_value in enumerate(self.tree_nodes):
@@ -81,7 +74,7 @@ class BinaryTreeCanvas(QWidget):
             if left_child_idx < len(self.tree_nodes) and self.tree_nodes[left_child_idx] is not None:
                 if left_child_idx in self.positions:
                     left_x, left_y = self.positions[left_child_idx]
-                    painter.setPen(QPen(QColor("#34495e"), 1.5))  # Thinner lines
+                    painter.setPen(QPen(QColor("#34495e"), 1.5))
                     painter.drawLine(x, y + node_radius, left_x, left_y - node_radius)
             
             # Draw edge to right child
@@ -89,7 +82,7 @@ class BinaryTreeCanvas(QWidget):
             if right_child_idx < len(self.tree_nodes) and self.tree_nodes[right_child_idx] is not None:
                 if right_child_idx in self.positions:
                     right_x, right_y = self.positions[right_child_idx]
-                    painter.setPen(QPen(QColor("#34495e"), 1.5))  # Thinner lines
+                    painter.setPen(QPen(QColor("#34495e"), 1.5))
                     painter.drawLine(x, y + node_radius, right_x, right_y - node_radius)
         
         # Draw nodes
@@ -101,14 +94,13 @@ class BinaryTreeCanvas(QWidget):
             
             # Draw node circle
             painter.setBrush(QBrush(QColor("#3498db")))
-            painter.setPen(QPen(QColor("#2c3e50"), 1.5))  # Thinner border
+            painter.setPen(QPen(QColor("#2c3e50"), 1.5))
             painter.drawEllipse(x - node_radius, y - node_radius, node_radius * 2, node_radius * 2)
             
-            # Draw node value with smaller font
+            # Draw node value
             painter.setPen(QPen(QColor("white")))
-            painter.setFont(QFont("Arial", 10, QFont.Weight.Bold))  # Reduced from 12 to 10
+            painter.setFont(QFont("Arial", 10, QFont.Weight.Bold))
             
-            # Truncate long values
             display_value = str(node_value)
             if len(display_value) > 4:
                 display_value = display_value[:3] + "..."
@@ -117,7 +109,6 @@ class BinaryTreeCanvas(QWidget):
                            Qt.AlignmentFlag.AlignCenter, display_value)
     
     def _calculate_level(self, index):
-        """Calculate the level of a node given its index in array representation"""
         if index < 0:
             return 0
         return int(math.log2(index + 1))
@@ -195,7 +186,6 @@ class BinaryTreePage(QWidget):
         value = self.tree_input.text().strip()
         if value:
             try:
-                # Try to convert to int, fallback to string
                 try:
                     value = int(value)
                 except ValueError:
@@ -221,12 +211,10 @@ class BinaryTreePage(QWidget):
                 QMessageBox.warning(self, "Error", f"Could not delete node: {str(e)}")
     
     def show_traversal(self, order):
-        """Show traversal results in a message box"""
         if self.tree.root is None:
             QMessageBox.information(self, "Empty Tree", "Tree is empty!")
             return
         
-        # Collect values in a list
         result = []
         
         if order == "in-order":
@@ -241,7 +229,6 @@ class BinaryTreePage(QWidget):
                               f"{order.title()}: {result_str}")
     
     def _inorder_collect(self, node, result):
-        """Helper to collect inorder traversal"""
         if node is None:
             return
         self._inorder_collect(node.left, result)
@@ -249,7 +236,6 @@ class BinaryTreePage(QWidget):
         self._inorder_collect(node.right, result)
     
     def _preorder_collect(self, node, result):
-        """Helper to collect preorder traversal"""
         if node is None:
             return
         result.append(node.data)
@@ -257,7 +243,6 @@ class BinaryTreePage(QWidget):
         self._preorder_collect(node.right, result)
     
     def _postorder_collect(self, node, result):
-        """Helper to collect postorder traversal"""
         if node is None:
             return
         self._postorder_collect(node.left, result)
@@ -265,10 +250,8 @@ class BinaryTreePage(QWidget):
         result.append(node.data)
     
     def update_display(self):
-        """Update the visual display of the tree"""
         nodes = self.tree.levelOrder(self.tree.root)
         self.tree_canvas.set_tree_data(nodes)
         
-        # Count only non-None nodes
         actual_node_count = sum(1 for node in nodes if node is not None)
         self.tree_info.setText(f"Nodes: {actual_node_count}")
