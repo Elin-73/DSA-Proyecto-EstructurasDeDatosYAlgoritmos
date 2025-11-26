@@ -200,44 +200,59 @@ class CircularList:
         self.size = 0
         self.head = None
     
-    def push(self, value):
-        if value is None: return None
-        if self.size == 0:
-            new_node = self.Node(value)
+    def push(self, position, data):
+        new_node = self.Node(data)
+        if position < 0:
+            print("Invalid position")
+            return "Invalid position"
+        if position == 0:
+            new_node.next = self.head
             self.head = new_node
-            new_node.next = new_node
-            size += 1
             return new_node
-        
-        current_node = self.head.next
+        current = self.head
+        count = 0
+        while count < position - 1 and current:
+            current = current.next
+            count += 1
+        if not current:
+            print("Position out of range")
+            return "Position out of range"
+        new_node.next = current.next
+        current.next = new_node
+
+    def display(self):
+        current = self.head
+        while current:
+            print(current.data, end=" -> ")
+            current = current.next
+        print("None")
     
-    def pop(self, value):
-        if value is None: return None
-        if self.size == 0:
-            return "List is Empty!"
-        if self.head.data == value:
-            eliminado = current_node.next
-            current_node.next = current_node.next.next
-            size -= 1
-            return eliminado
-        if current_node.next.data == value:
-            eliminado = current_node.next
-            current_node.next = current_node.next.next
-            size -= 1
-            return eliminado
-        
-        current_node = self.head.next
+    def pop(self, position):
+        if not self.head:
+            print("Circular Linked List is empty")
+            return "Circular Linked List is empty"
+        if position < 0:
+            print("Invalid position")
+            return "Invalid position"
 
-        size += 1
-        return new_node
+        if position == 0:
 
+            if self.head.next == self.head:
+                self.head = None
+            else:
+                current = self.head
+                while current.next != self.head:
+                    current = current.next
+                current.next = self.head.next
+                self.head = self.head.next
+            return position
+        current = self.head
+        count = 0
+        while count < position - 1 and current.next != self.head:
+            current = current.next
+            count += 1
+        if count < position - 1:
+            print("Position out of range")
+            return "Position out of range"
+        current.next = current.next.next
 
-class Graph:
-    class Node:
-        def __init__(self, data):
-            self.data = data
-            self.input = None
-            self.output = None
-    
-    def __init__(self):
-        pass

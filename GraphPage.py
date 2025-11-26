@@ -1,22 +1,27 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, 
                             QHBoxLayout, QPushButton, QLabel,
-                            QLineEdit, QMessageBox, QScrollArea)
-from PyQt6.QtGui import QFont, QPainter, QPen, QBrush, QColor
+                            QLineEdit, QMessageBox, QScrollArea,
+                            QSplitter, QFrame)
+from PyQt6.QtGui import QFont, QPainter, QPen, QBrush, QColor, QIntValidator
 from PyQt6.QtCore import Qt, QPoint
 import math
 
 
 class GraphCanvas(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, title="Grafo", parent=None):
         super().__init__(parent)
-        self.setMinimumSize(800, 500)
+        self.setMinimumSize(600, 450)
         self.vertices = {}
         self.edges = []
-        self.mst_edges = []  # Edges that are part of MST
+        self.mst_edges = []
+        self.title = title
+        self.is_mst_view = False
         
-    def set_graph_data(self, adjacency_list, mst_edges=None):
+    def set_graph_data(self, adjacency_list, mst_edges=None, is_mst_view=False):
         vertices_list = list(adjacency_list.keys())
         n = len(vertices_list)
+        
+        self.is_mst_view = is_mst_view
         
         if n == 0:
             self.vertices = {}
@@ -25,13 +30,12 @@ class GraphCanvas(QWidget):
             self.update()
             return
         
-        # Store MST edges if provided
         self.mst_edges = mst_edges if mst_edges else []
         
         # Position vertices in a circle
         center_x = self.width() // 2
-        center_y = self.height() // 2
-        radius = min(center_x, center_y) - 80
+        center_y = (self.height() - 30) // 2 + 30  # Account for title
+        radius = min(center_x, center_y - 30) - 60
         
         for i, vertex in enumerate(vertices_list):
             angle = 2 * math.pi * i / n - math.pi / 2
@@ -51,16 +55,36 @@ class GraphCanvas(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         
+        # Draw title background
+        painter.setBrush(QBrush(QColor("#34495e")))
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.drawRect(0, 0, self.width(), 30)
+        
+        # Draw title
+        painter.setPen(QPen(QColor("white")))
+        painter.setFont(QFont("Arial", 12, QFont.Weight.Bold))
+        painter.drawText(0, 0, self.width(), 30, Qt.AlignmentFlag.AlignCenter, self.title)
+        
         if not self.vertices:
             painter.setPen(QPen(QColor("#7f8c8d"), 2))
             painter.setFont(QFont("Arial", 12))
             painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "Graph is empty")
             return
         
-        node_radius = 25
+        node_radius = 22
         
-        # Draw edges first
-        for from_vertex, to_vertex, weight in self.edges:
+        # Filter edges for MST view
+        edges_to_draw = self.edges
+        if self.is_mst_view and self.mst_edges:
+            # Only draw MST edges in MST view
+            mst_set = set()
+            for u, v, w in self.mst_edges:
+                mst_set.add((u, v, w))
+                mst_set.add((v, u, w))
+            edges_to_draw = [(u, v, w) for u, v, w in self.edges if (u, v, w) in mst_set or (v, u, w) in mst_set]
+        
+        # Draw edges
+        for from_vertex, to_vertex, weight in edges_to_draw:
             if from_vertex in self.vertices and to_vertex in self.vertices:
                 x1, y1 = self.vertices[from_vertex]
                 x2, y2 = self.vertices[to_vertex]
@@ -70,32 +94,30 @@ class GraphCanvas(QWidget):
                              (to_vertex, from_vertex, weight) in self.mst_edges
                 
                 # Use different color for MST edges
-                if is_mst_edge:
-                    painter.setPen(QPen(QColor("#27ae60"), 4))  # Green and thicker for MST
+                if is_mst_edge or self.is_mst_view:
+                    painter.setPen(QPen(QColor("#27ae60"), 3))
                 else:
-                    painter.setPen(QPen(QColor("#34495e"), 2))  # Normal gray
+                    painter.setPen(QPen(QColor("#7f8c8d"), 2))
                 
                 # Draw line
                 painter.drawLine(x1, y1, x2, y2)
                 
                 # Draw arrow head
                 angle = math.atan2(y2 - y1, x2 - x1)
-                arrow_size = 12
+                arrow_size = 10
                 
-                # Calculate arrow endpoint
                 end_x = x2 - node_radius * math.cos(angle)
                 end_y = y2 - node_radius * math.sin(angle)
                 
-                # Arrow points
                 arrow_p1_x = end_x - arrow_size * math.cos(angle - math.pi / 6)
                 arrow_p1_y = end_y - arrow_size * math.sin(angle - math.pi / 6)
                 arrow_p2_x = end_x - arrow_size * math.cos(angle + math.pi / 6)
                 arrow_p2_y = end_y - arrow_size * math.sin(angle + math.pi / 6)
                 
-                if is_mst_edge:
+                if is_mst_edge or self.is_mst_view:
                     painter.setBrush(QBrush(QColor("#27ae60")))
                 else:
-                    painter.setBrush(QBrush(QColor("#34495e")))
+                    painter.setBrush(QBrush(QColor("#7f8c8d")))
                     
                 points = [
                     QPoint(int(end_x), int(end_y)),
@@ -104,67 +126,58 @@ class GraphCanvas(QWidget):
                 ]
                 painter.drawPolygon(points)
                 
-                # Draw weight label in the middle of the edge
+                # Draw weight label
                 mid_x = (x1 + x2) // 2
                 mid_y = (y1 + y2) // 2
                 
-                # Draw background for weight text
-                painter.setBrush(QBrush(QColor("#ecf0f1")))
+                painter.setBrush(QBrush(QColor("white")))
                 painter.setPen(QPen(QColor("#7f8c8d"), 1))
-                painter.drawEllipse(mid_x - 15, mid_y - 15, 30, 30)
+                painter.drawEllipse(mid_x - 12, mid_y - 12, 24, 24)
                 
-                # Draw weight text
-                if is_mst_edge:
+                if is_mst_edge or self.is_mst_view:
                     painter.setPen(QPen(QColor("#27ae60")))
-                    painter.setFont(QFont("Arial", 10, QFont.Weight.Bold))
+                    painter.setFont(QFont("Arial", 9, QFont.Weight.Bold))
                 else:
                     painter.setPen(QPen(QColor("#34495e")))
                     painter.setFont(QFont("Arial", 9))
                     
-                painter.drawText(mid_x - 15, mid_y - 15, 30, 30,
+                painter.drawText(mid_x - 12, mid_y - 12, 24, 24,
                                Qt.AlignmentFlag.AlignCenter, str(weight))
         
         # Draw vertices
         for vertex, (x, y) in self.vertices.items():
-            # Draw circle
             painter.setBrush(QBrush(QColor("#e74c3c")))
             painter.setPen(QPen(QColor("#c0392b"), 2))
             painter.drawEllipse(x - node_radius, y - node_radius, node_radius * 2, node_radius * 2)
             
-            # Draw vertex label
             painter.setPen(QPen(QColor("white")))
-            painter.setFont(QFont("Arial", 12, QFont.Weight.Bold))
+            painter.setFont(QFont("Arial", 11, QFont.Weight.Bold))
             
-            # Truncate long labels
             display_label = str(vertex)
             if len(display_label) > 3:
-                display_label = display_label[:3] + "..."
+                display_label = display_label[:3]
             
             painter.drawText(x - node_radius, y - node_radius, node_radius * 2, node_radius * 2,
                            Qt.AlignmentFlag.AlignCenter, display_label)
 
 
 class UnionFind:
-    """Union-Find (Disjoint Set Union) data structure for Kruskal's algorithm"""
     def __init__(self, vertices):
         self.parent = {v: v for v in vertices}
         self.rank = {v: 0 for v in vertices}
     
     def find(self, vertex):
-        """Find the root of the set containing vertex (with path compression)"""
         if self.parent[vertex] != vertex:
             self.parent[vertex] = self.find(self.parent[vertex])
         return self.parent[vertex]
     
     def union(self, v1, v2):
-        """Union two sets containing v1 and v2 (union by rank)"""
         root1 = self.find(v1)
         root2 = self.find(v2)
         
         if root1 == root2:
-            return False  # Already in same set
+            return False
         
-        # Union by rank
         if self.rank[root1] < self.rank[root2]:
             self.parent[root1] = root2
         elif self.rank[root1] > self.rank[root2]:
@@ -179,167 +192,204 @@ class UnionFind:
 class GraphPage(QWidget):
     def __init__(self):
         super().__init__()
-        # Graph stored as adjacency list with weights: {vertex: [(neighbor, weight), ...]}
         self.graph = {}
-        self.mst_edges = []  # Store MST edges
+        self.mst_edges = []
         self.total_mst_weight = 0
         
         layout = QVBoxLayout()
         
-        title = QLabel("🕸️ Graph (Weighted Directed Graph)")
+        title = QLabel("🕸️ Grafo (Grafo con recorrido de Kruskal)")
         title.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         layout.addWidget(title)
         
-        desc = QLabel("A weighted graph for Kruskal's Minimum Spanning Tree algorithm!")
+        desc = QLabel("Añade vértices con cualquier nombre simple" \
+        "Añade arista con peso de vértice a vértice existente." \
+        "Corre el algoritmo de Kruskal para encontrar el recorrido más óptimo")
         desc.setWordWrap(True)
         layout.addWidget(desc)
         
         # Input area
         input_layout = QHBoxLayout()
         self.vertex_input = QLineEdit()
-        self.vertex_input.setPlaceholderText("Vertex name")
+        self.vertex_input.setPlaceholderText("Nombre de vértice")
+        self.vertex_input.setMaximumWidth(120)
         input_layout.addWidget(self.vertex_input)
         
-        add_vertex_btn = QPushButton("Add Vertex")
+        add_vertex_btn = QPushButton("Añadir Vértice")
         add_vertex_btn.clicked.connect(self.add_vertex)
-        add_vertex_btn.setStyleSheet("background-color: #2ecc71; color: white; padding: 10px;")
+        add_vertex_btn.setStyleSheet("background-color: #2ecc71; color: white; padding: 8px;")
         input_layout.addWidget(add_vertex_btn)
         
-        layout.addLayout(input_layout)
+        input_layout.addSpacing(20)
         
-        # Edge input
-        edge_layout = QHBoxLayout()
         self.from_vertex = QLineEdit()
-        self.from_vertex.setPlaceholderText("From vertex")
-        edge_layout.addWidget(self.from_vertex)
+        self.from_vertex.setPlaceholderText("Desde")
+        self.from_vertex.setMaximumWidth(80)
+        input_layout.addWidget(self.from_vertex)
         
         self.to_vertex = QLineEdit()
-        self.to_vertex.setPlaceholderText("To vertex")
-        edge_layout.addWidget(self.to_vertex)
+        self.to_vertex.setPlaceholderText("Hacia")
+        self.to_vertex.setMaximumWidth(80)
+        input_layout.addWidget(self.to_vertex)
         
         self.weight_input = QLineEdit()
-        self.weight_input.setPlaceholderText("Weight")
-        self.weight_input.setMaximumWidth(80)
-        edge_layout.addWidget(self.weight_input)
+        self.weight_input.setPlaceholderText("Peso")
+        self.weight_input.setMaximumWidth(70)
+        self.weight_input.setValidator(QIntValidator(1, 9999))
+        input_layout.addWidget(self.weight_input)
         
-        add_edge_btn = QPushButton("Add Edge")
+        add_edge_btn = QPushButton("Añadir Arista")
         add_edge_btn.clicked.connect(self.add_edge)
-        add_edge_btn.setStyleSheet("background-color: #3498db; color: white; padding: 10px;")
-        edge_layout.addWidget(add_edge_btn)
+        add_edge_btn.setStyleSheet("background-color: #3498db; color: white; padding: 8px;")
+        input_layout.addWidget(add_edge_btn)
         
-        layout.addLayout(edge_layout)
+        input_layout.addStretch()
+        layout.addLayout(input_layout)
         
         # Algorithm buttons
         algo_layout = QHBoxLayout()
         
-        kruskal_btn = QPushButton("Run Kruskal's MST")
+        kruskal_btn = QPushButton("▶ Corre algoritmo Kruskal")
         kruskal_btn.clicked.connect(self.run_kruskal)
-        kruskal_btn.setStyleSheet("background-color: #9b59b6; color: white; padding: 10px;")
+        kruskal_btn.setStyleSheet("background-color: #9b59b6; color: white; padding: 10px; font-weight: bold;")
         algo_layout.addWidget(kruskal_btn)
         
-        clear_mst_btn = QPushButton("Clear MST")
+        clear_mst_btn = QPushButton("Limpiar")
         clear_mst_btn.clicked.connect(self.clear_mst)
         clear_mst_btn.setStyleSheet("background-color: #f39c12; color: white; padding: 10px;")
         algo_layout.addWidget(clear_mst_btn)
         
-        clear_btn = QPushButton("Clear Graph")
+        clear_btn = QPushButton("Limpiar todo")
         clear_btn.clicked.connect(self.clear_graph)
         clear_btn.setStyleSheet("background-color: #e74c3c; color: white; padding: 10px;")
         algo_layout.addWidget(clear_btn)
         
+        algo_layout.addStretch()
         layout.addLayout(algo_layout)
         
-        # Visualization area
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        self.graph_canvas = GraphCanvas()
-        scroll.setWidget(self.graph_canvas)
-        layout.addWidget(QLabel("Graph Visualization (MST edges in green):"))
-        layout.addWidget(scroll)
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+        
+        original_frame = QFrame()
+        original_frame.setFrameShape(QFrame.Shape.StyledPanel)
+        original_layout = QVBoxLayout(original_frame)
+        original_layout.setContentsMargins(0, 0, 0, 0)
+        
+        original_scroll = QScrollArea()
+        original_scroll.setWidgetResizable(True)
+        self.original_canvas = GraphCanvas("Grafo original")
+        original_scroll.setWidget(self.original_canvas)
+        original_layout.addWidget(original_scroll)
+        
+        splitter.addWidget(original_frame)
+        
+        mst_frame = QFrame()
+        mst_frame.setFrameShape(QFrame.Shape.StyledPanel)
+        mst_layout = QVBoxLayout(mst_frame)
+        mst_layout.setContentsMargins(0, 0, 0, 0)
+        
+        mst_scroll = QScrollArea()
+        mst_scroll.setWidgetResizable(True)
+        self.mst_canvas = GraphCanvas("Arbol de recorrido mínimo (Kruskal)")
+        mst_scroll.setWidget(self.mst_canvas)
+        mst_layout.addWidget(mst_scroll)
+        
+        splitter.addWidget(mst_frame)
+        
+        # Set equal sizes
+        splitter.setSizes([500, 500])
+        
+        layout.addWidget(splitter)
         
         # Info area
-        self.graph_info = QLabel("Graph is empty")
+        self.graph_info = QLabel("Grafo vacío | Añada vértices y arístas")
+        self.graph_info.setStyleSheet("padding: 5px; background-color: #ecf0f1; border-radius: 3px;")
         layout.addWidget(self.graph_info)
         
-        layout.addStretch()
         self.setLayout(layout)
         self.update_display()
     
     def add_vertex(self):
         vertex = self.vertex_input.text().strip()
-        if vertex:
-            if vertex not in self.graph:
-                self.graph[vertex] = []
-                self.vertex_input.clear()
-                self.update_display()
-            else:
-                QMessageBox.warning(self, "Duplicate", "Vertex already exists!")
+        if not vertex:
+            QMessageBox.warning(self, "Caja vacía", "Añada nombre para el vértice")
+            return
+        
+        if vertex in self.graph:
+            QMessageBox.warning(self, "Duplicado", "Vértice duplicado")
+            return
+        
+        self.graph[vertex] = []
+        self.vertex_input.clear()
+        self.clear_mst()
+        self.update_display()
     
     def add_edge(self):
         from_v = self.from_vertex.text().strip()
         to_v = self.to_vertex.text().strip()
         weight_str = self.weight_input.text().strip()
         
-        if from_v and to_v and weight_str:
-            try:
-                weight = int(weight_str)
-                
-                if from_v in self.graph and to_v in self.graph:
-                    # Check if edge already exists
-                    if not any(neighbor == to_v for neighbor, _ in self.graph[from_v]):
-                        self.graph[from_v].append((to_v, weight))
-                        self.from_vertex.clear()
-                        self.to_vertex.clear()
-                        self.weight_input.clear()
-                        self.clear_mst()  # Clear MST when graph changes
-                        self.update_display()
-                    else:
-                        QMessageBox.warning(self, "Duplicate", "Edge already exists!")
-                else:
-                    QMessageBox.warning(self, "Invalid", "Both vertices must exist first!")
-            except ValueError:
-                QMessageBox.warning(self, "Invalid Weight", "Weight must be a number!")
-    
-    def run_kruskal(self):
-        """Run Kruskal's algorithm to find Minimum Spanning Tree"""
-        if len(self.graph) < 2:
-            QMessageBox.warning(self, "Not Enough Vertices", 
-                              "Need at least 2 vertices to find MST!")
+        if not from_v or not to_v or not weight_str:
+            QMessageBox.warning(self, "Sin valor", "Rellene las cajas con los valores correspondientes")
             return
         
-        # Collect all edges (treat as undirected for MST)
+        try:
+            weight = int(weight_str)
+            if weight <= 0:
+                QMessageBox.warning(self, "Peso invalido", "Peso debe ser un entero positivo")
+                return
+        except ValueError:
+            QMessageBox.warning(self, "Peso invalido", "Peso debe ser un número entero positivo")
+            return
+        
+        if from_v not in self.graph or to_v not in self.graph:
+            QMessageBox.warning(self, "Vértices invalidos", "Ambos vértices deben existir")
+            return
+        
+        if any(neighbor == to_v for neighbor, _ in self.graph[from_v]):
+            QMessageBox.warning(self, "Arista duplicados", "Esta arista ya existe")
+            return
+        
+        self.graph[from_v].append((to_v, weight))
+        self.graph[to_v].append((from_v, weight))
+        
+        self.from_vertex.clear()
+        self.to_vertex.clear()
+        self.weight_input.clear()
+        self.clear_mst()
+        self.update_display()
+    
+    def run_kruskal(self):
+        if len(self.graph) < 2:
+            QMessageBox.warning(self, "Sin vértices suficientes", 
+                              "Se necesitan al menos dos vértices para el algoritmo.")
+            return
+        
         all_edges = []
         seen_edges = set()
         
         for from_v, neighbors in self.graph.items():
             for to_v, weight in neighbors:
-                # Create canonical form (smaller vertex first) to avoid duplicates
-                edge = tuple(sorted([from_v, to_v]) + [weight])
-                if edge not in seen_edges:
-                    seen_edges.add(edge)
+                edge_key = tuple(sorted([from_v, to_v]))
+                if edge_key not in seen_edges:
+                    seen_edges.add(edge_key)
                     all_edges.append((from_v, to_v, weight))
         
         if not all_edges:
-            QMessageBox.warning(self, "No Edges", "Graph has no edges!")
+            QMessageBox.warning(self, "Sin artistas", "Grafo sin artistas.")
             return
         
-        # Sort edges by weight (Kruskal's algorithm)
         all_edges.sort(key=lambda x: x[2])
         
-        # Initialize Union-Find
+        # Run Kruskal's
         uf = UnionFind(self.graph.keys())
-        
-        # Kruskal's algorithm
         self.mst_edges = []
         self.total_mst_weight = 0
         
         for from_v, to_v, weight in all_edges:
-            # If vertices are in different sets, add edge to MST
             if uf.union(from_v, to_v):
                 self.mst_edges.append((from_v, to_v, weight))
                 self.total_mst_weight += weight
                 
-                # Stop when we have V-1 edges (complete MST)
                 if len(self.mst_edges) == len(self.graph) - 1:
                     break
         
@@ -347,19 +397,19 @@ class GraphPage(QWidget):
         
         # Show result
         if len(self.mst_edges) == len(self.graph) - 1:
-            edges_str = "\n".join([f"{u} -- {v} (weight: {w})" 
+            edges_str = "\n".join([f"  {u} ─── {v}  (weight: {w})" 
                                   for u, v, w in self.mst_edges])
             QMessageBox.information(self, "Kruskal's MST Result", 
-                                  f"Minimum Spanning Tree found!\n\n"
-                                  f"Edges in MST:\n{edges_str}\n\n"
-                                  f"Total MST Weight: {self.total_mst_weight}")
+                                  f"✓ Minimum Spanning Tree found!\n\n"
+                                  f"MST Edges:\n{edges_str}\n\n"
+                                  f"Total Weight: {self.total_mst_weight}")
         else:
             QMessageBox.warning(self, "Disconnected Graph", 
-                              f"Graph is disconnected! Found {len(self.mst_edges)} edges.\n"
-                              f"Need {len(self.graph) - 1} edges for complete MST.")
+                              f"Graph is disconnected!\n"
+                              f"Found {len(self.mst_edges)} edges, need {len(self.graph) - 1} for MST.\n"
+                              f"Make sure all vertices are connected.")
     
     def clear_mst(self):
-        """Clear the MST highlighting"""
         self.mst_edges = []
         self.total_mst_weight = 0
         self.update_display()
@@ -371,17 +421,17 @@ class GraphPage(QWidget):
         self.update_display()
     
     def update_display(self):
-        # Convert to simple adjacency list for canvas
-        simple_adj = {v: [(n, w) for n, w in neighbors] 
-                     for v, neighbors in self.graph.items()}
+        # Update original graph canvas (shows all edges, MST highlighted)
+        self.original_canvas.set_graph_data(self.graph, self.mst_edges, is_mst_view=False)
         
-        self.graph_canvas.set_graph_data(simple_adj, self.mst_edges)
+        # Update MST canvas (shows only MST edges)
+        self.mst_canvas.set_graph_data(self.graph, self.mst_edges, is_mst_view=True)
         
         vertices_count = len(self.graph)
-        edges_count = sum(len(neighbors) for neighbors in self.graph.values())
+        edges_count = sum(len(neighbors) for neighbors in self.graph.values()) // 2  # Undirected
         
         info_text = f"Vertices: {vertices_count} | Edges: {edges_count}"
         if self.mst_edges:
-            info_text += f" | MST Weight: {self.total_mst_weight}"
+            info_text += f" | MST Edges: {len(self.mst_edges)} | MST Total Weight: {self.total_mst_weight}"
         
         self.graph_info.setText(info_text)

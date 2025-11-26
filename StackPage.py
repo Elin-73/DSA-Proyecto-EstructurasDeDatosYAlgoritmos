@@ -12,46 +12,44 @@ class StackPage(QWidget):
         
         layout = QVBoxLayout()
         
-        title = QLabel("📚 Stack (LIFO - Last In First Out)")
+        title = QLabel("📚 Pila (LIFO - Último en entrar es el primero en salir)")
         title.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         layout.addWidget(title)
         
-        desc = QLabel("A Stack is like a stack of plates - you can only add or remove from the top!")
+        desc = QLabel("Una pila es común en la vida cotidiana, ejemplo:" \
+                    "Al apilar libros para ordenarlos.")
         desc.setWordWrap(True)
         layout.addWidget(desc)
         
-        # Input area
         input_layout = QHBoxLayout()
         self.stack_input = QLineEdit()
-        self.stack_input.setPlaceholderText("Enter a value")
+        self.stack_input.setPlaceholderText("Ingresar título del libro")
         input_layout.addWidget(self.stack_input)
         
-        push_btn = QPushButton("Push")
+        push_btn = QPushButton("Ingresar")
         push_btn.clicked.connect(self.push_stack)
         push_btn.setStyleSheet("background-color: #2ecc71; color: white; padding: 10px;")
         input_layout.addWidget(push_btn)
         
-        pop_btn = QPushButton("Pop")
+        pop_btn = QPushButton("Quitar cima")
         pop_btn.clicked.connect(self.pop_stack)
         pop_btn.setStyleSheet("background-color: #e74c3c; color: white; padding: 10px;")
         input_layout.addWidget(pop_btn)
         
-        peek_btn = QPushButton("Peek")
+        peek_btn = QPushButton("Ver cima")
         peek_btn.clicked.connect(self.peek_stack)
         peek_btn.setStyleSheet("background-color: #3498db; color: white; padding: 10px;")
         input_layout.addWidget(peek_btn)
         
         layout.addLayout(input_layout)
         
-        # Visualization area
         self.stack_display = QTextEdit()
         self.stack_display.setReadOnly(True)
         self.stack_display.setMaximumHeight(300)
-        layout.addWidget(QLabel("Stack Visualization:"))
+        layout.addWidget(QLabel("Visualización de Pila:"))
         layout.addWidget(self.stack_display)
         
-        # Info area
-        self.stack_info = QLabel("Stack is empty")
+        self.stack_info = QLabel("Pila Vacía")
         layout.addWidget(self.stack_info)
         
         layout.addStretch()
@@ -68,23 +66,23 @@ class StackPage(QWidget):
     def pop_stack(self):
         value = self.stack.pop()
         if value == "Stack is empty":
-            QMessageBox.warning(self, "Empty Stack", "Stack is empty!")
+            QMessageBox.warning(self, "Pila Vacía", "No hay libros en la pila.")
         else:
-            QMessageBox.information(self, "Popped", f"Popped value: {value}")
+            QMessageBox.information(self, "Despilado", f"Libro removido: {value}")
             self.update_display()
     
     def peek_stack(self):
         value = self.stack.peek()
         if value == "Stack is empty":
-            QMessageBox.warning(self, "Empty Stack", "Stack is empty!")
+            QMessageBox.warning(self, "Pila Vacía", "No hay libros en la pila.")
         else:
-            QMessageBox.information(self, "Peek", f"Top value: {value}")
+            QMessageBox.information(self, "Cima de libros", f"Libro en la cima de libros: {value}")
     
     def update_display(self):
         stack_list = self.stack.toList()
         
-        display = "Stack visualization:\n"
+        display = "Visualización de la pila:\n"
         display += stack_list
         
         self.stack_display.setText(display)
-        self.stack_info.setText(f"Size: {self.stack.size()} | Top: {self.stack.peek() if not self.stack.isEmpty() else 'None'}")
+        self.stack_info.setText(f"Tamaño: {self.stack.size()} | Cima: {self.stack.peek() if not self.stack.isEmpty() else 'None'}")
