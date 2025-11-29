@@ -13,12 +13,15 @@ class ArrayPage(QWidget):
         
         layout = QVBoxLayout()
         
-        title = QLabel("📊 Arreglo")
+        title = QLabel("📊 Arreglo de clientes")
         title.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         layout.addWidget(title)
         
-        desc = QLabel("Los arreglos conservan valores de memoria en una lista de índices." \
-        "Añada números al arreglo en cualquier parte de si.")
+        desc = QLabel("En este arreglo se van a almacenar el número de cuenta\n" \
+        "de los clientes de la librería, todos aquellos que tengan su tarjeta\n" \
+        "de bliblioteca a la mano pueden ser atendidos.\n" \
+        "Esta medida es provisional hasta la implementación de una base de datos formal.\n" \
+        "Agregue el número de cuenta de los clientes según se vayan registrando.")
         desc.setWordWrap(True)
         layout.addWidget(desc)
         

@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
         sidebar_layout.setContentsMargins(0, 0, 0, 0)
         sidebar_layout.setSpacing(0)
         
-        app_title = QLabel("  Estructuras de Datos")
+        app_title = QLabel("  Librería y más")
         app_title.setStyleSheet("""
             color: white; 
             padding: 20px; 
@@ -42,12 +42,12 @@ class MainWindow(QMainWindow):
         
         self.menu_buttons = []
         menu_items = [
-            ("📚", "Pila"),
-            ("🎫", "Cola"),
-            ("📊", "Arreglo"),
-            ("🔄", "Lista Circular Simple"),
+            ("📚", "Pila de libros"),
+            ("🎫", "Cola de clientes"),
+            ("📊", "Arreglo clientes"),
+            ("🔄📚", "Lista de Libros prestados"),
             ("🌳", "Arbol Binario"),
-            ("🕸️", "Grafo")
+            ("🏝", "Distancias y rutas entre islas")
         ]
         
         for icon, name in menu_items:

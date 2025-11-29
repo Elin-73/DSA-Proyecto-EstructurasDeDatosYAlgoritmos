@@ -196,63 +196,147 @@ class CircularList:
         def __init__(self, data):
             self.data = data
             self.next = None
+    
     def __init__(self):
         self.size = 0
         self.head = None
     
-    def push(self, position, data):
+    def push(self, data):
         new_node = self.Node(data)
-        if position < 0:
-            print("Invalid position")
-            return "Invalid position"
-        if position == 0:
-            new_node.next = self.head
+        
+        if self.head is None:
             self.head = new_node
+            new_node.next = self.head
+            self.size += 1
             return new_node
+        
         current = self.head
-        count = 0
-        while count < position - 1 and current:
+        while current.next != self.head:
             current = current.next
-            count += 1
-        if not current:
-            print("Position out of range")
-            return "Position out of range"
-        new_node.next = current.next
+        
         current.next = new_node
-
-    def display(self):
-        current = self.head
-        while current:
-            print(current.data, end=" -> ")
-            current = current.next
-        print("None")
+        new_node.next = self.head
+        self.size += 1
+        return new_node
     
-    def pop(self, position):
-        if not self.head:
-            print("Circular Linked List is empty")
-            return "Circular Linked List is empty"
-        if position < 0:
-            print("Invalid position")
+    def insert_at(self, position, data):
+        if position < 0 or position > self.size:
             return "Invalid position"
-
+        
         if position == 0:
-
-            if self.head.next == self.head:
-                self.head = None
+            new_node = self.Node(data)
+            
+            if self.head is None:
+                self.head = new_node
+                new_node.next = self.head
             else:
                 current = self.head
                 while current.next != self.head:
                     current = current.next
-                current.next = self.head.next
-                self.head = self.head.next
-            return position
+                
+                new_node.next = self.head
+                current.next = new_node
+                self.head = new_node
+            
+            self.size += 1
+            return new_node
+        
+        if position == self.size:
+            return self.push(data)
+        
+        new_node = self.Node(data)
         current = self.head
-        count = 0
-        while count < position - 1 and current.next != self.head:
+        
+        for i in range(position - 1):
             current = current.next
-            count += 1
-        if count < position - 1:
-            print("Position out of range")
-            return "Position out of range"
+        
+        new_node.next = current.next
+        current.next = new_node
+        self.size += 1
+        return new_node
+    
+    def pop(self):
+        if self.head is None:
+            return "List is Empty!"
+        
+        if self.size == 1:
+            data = self.head.data
+            self.head = None
+            self.size = 0
+            return data
+        
+        current = self.head
+        while current.next != self.head:
+            current = current.next
+        
+        data = self.head.data
+        current.next = self.head.next
+        self.head = self.head.next
+        self.size -= 1
+        return data
+    
+    def delete_at(self, position):
+        if self.head is None:
+            return "List is Empty!"
+        
+        if position < 0 or position >= self.size:
+            return "Invalid position"
+        
+        if position == 0:
+            return self.pop()
+        
+        current = self.head
+        for i in range(position - 1):
+            current = current.next
+        
+        deleted_data = current.next.data
+        
         current.next = current.next.next
-
+        self.size -= 1
+        return deleted_data
+    
+    def get_at(self, position):
+        if self.head is None or position < 0 or position >= self.size:
+            return None
+        
+        current = self.head
+        for i in range(position):
+            current = current.next
+        
+        return current.data
+    
+    def display(self):
+        if self.head is None:
+            return "Lista vacía"
+        
+        result = []
+        current = self.head
+        
+        while True:
+            result.append(str(current.data))
+            current = current.next
+            if current == self.head:
+                break
+        
+        return " → ".join([f"[{item}]" for item in result]) + f" → [vuelve a {self.head.data}] ↻"
+    
+    def traverse(self):
+        if self.head is None:
+            return []
+        
+        result = []
+        current = self.head
+        
+        while True:
+            result.append(current.data)
+            current = current.next
+            if current == self.head:
+                break
+        
+        return result
+    
+    def is_empty(self):
+        return self.head is None
+    
+    def get_size(self):
+        return self.size

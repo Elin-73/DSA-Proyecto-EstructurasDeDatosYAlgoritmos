@@ -12,12 +12,13 @@ class QueuePage(QWidget):
         
         layout = QVBoxLayout()
         
-        title = QLabel("🎫 Cola (FIFO - Primero en entrar es el primero en salir)")
+        title = QLabel("🎫 Cola de cliente")
         title.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         layout.addWidget(title)
         
-        desc = QLabel("Las colas se pueden ejemplificar sobre colas hacia cajas registradoras." \
-        "               El primero en llegar es el primero en ser atendido")
+        desc = QLabel("En la misma biblioteca varios esperan ser atendidos por dudas \n" \
+        "y tramites con el bibliotecario. Agregue el nombre de los clientes con forme\n" \
+        "vayan agarrando un ticket. El primero en llegar es el primero en ser atendido.")
         desc.setWordWrap(True)
         layout.addWidget(desc)
         

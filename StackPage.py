@@ -12,12 +12,13 @@ class StackPage(QWidget):
         
         layout = QVBoxLayout()
         
-        title = QLabel("📚 Pila (LIFO - Último en entrar es el primero en salir)")
+        title = QLabel("📚 Pila de libros carro de biblioteca")
         title.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         layout.addWidget(title)
         
-        desc = QLabel("Una pila es común en la vida cotidiana, ejemplo:" \
-                    "Al apilar libros para ordenarlos.")
+        desc = QLabel("Al tener que ordenar varios libros, la persona encargada necesita\n" \
+        "tener un pila de los mismo al momento de introducirlos a su carro y sacarlos para su acomodo.\n" \
+        "Introduzca el nombre del libro y apilelos conforme vaya agregandolos al carro.")
         desc.setWordWrap(True)
         layout.addWidget(desc)
         
@@ -31,12 +32,12 @@ class StackPage(QWidget):
         push_btn.setStyleSheet("background-color: #2ecc71; color: white; padding: 10px;")
         input_layout.addWidget(push_btn)
         
-        pop_btn = QPushButton("Quitar cima")
+        pop_btn = QPushButton("Quitar libro de encima")
         pop_btn.clicked.connect(self.pop_stack)
         pop_btn.setStyleSheet("background-color: #e74c3c; color: white; padding: 10px;")
         input_layout.addWidget(pop_btn)
         
-        peek_btn = QPushButton("Ver cima")
+        peek_btn = QPushButton("Título del libro de la cima")
         peek_btn.clicked.connect(self.peek_stack)
         peek_btn.setStyleSheet("background-color: #3498db; color: white; padding: 10px;")
         input_layout.addWidget(peek_btn)

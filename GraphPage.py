@@ -32,9 +32,8 @@ class GraphCanvas(QWidget):
         
         self.mst_edges = mst_edges if mst_edges else []
         
-        # Position vertices in a circle
         center_x = self.width() // 2
-        center_y = (self.height() - 30) // 2 + 30  # Account for title
+        center_y = (self.height() - 30) // 2 + 30
         radius = min(center_x, center_y - 30) - 60
         
         for i, vertex in enumerate(vertices_list):
@@ -43,7 +42,6 @@ class GraphCanvas(QWidget):
             y = center_y + radius * math.sin(angle)
             self.vertices[vertex] = (int(x), int(y))
         
-        # Build edge list
         self.edges = []
         for from_vertex, neighbors in adjacency_list.items():
             for to_vertex, weight in neighbors:
@@ -55,12 +53,10 @@ class GraphCanvas(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         
-        # Draw title background
         painter.setBrush(QBrush(QColor("#34495e")))
         painter.setPen(Qt.PenStyle.NoPen)
         painter.drawRect(0, 0, self.width(), 30)
         
-        # Draw title
         painter.setPen(QPen(QColor("white")))
         painter.setFont(QFont("Arial", 12, QFont.Weight.Bold))
         painter.drawText(0, 0, self.width(), 30, Qt.AlignmentFlag.AlignCenter, self.title)
@@ -68,15 +64,13 @@ class GraphCanvas(QWidget):
         if not self.vertices:
             painter.setPen(QPen(QColor("#7f8c8d"), 2))
             painter.setFont(QFont("Arial", 12))
-            painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "Graph is empty")
+            painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "Grafo vacío")
             return
         
         node_radius = 22
         
-        # Filter edges for MST view
         edges_to_draw = self.edges
         if self.is_mst_view and self.mst_edges:
-            # Only draw MST edges in MST view
             mst_set = set()
             for u, v, w in self.mst_edges:
                 mst_set.add((u, v, w))
@@ -198,24 +192,27 @@ class GraphPage(QWidget):
         
         layout = QVBoxLayout()
         
-        title = QLabel("🕸️ Grafo (Grafo con recorrido de Kruskal)")
+        title = QLabel("🏝 Grafo de distancias entre islas")
         title.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         layout.addWidget(title)
         
-        desc = QLabel("Añade vértices con cualquier nombre simple" \
-        "Añade arista con peso de vértice a vértice existente." \
-        "Corre el algoritmo de Kruskal para encontrar el recorrido más óptimo")
+        desc = QLabel("En un archipielago se encuentran varias islas con distintas\n" \
+        "distancias entre sí. Se necesita encontrar las rutas de barco más optimas\n" \
+        "y minimizar las mismas.\n" \
+        "Agregue el nombre de las Islas y la distancia entre cada una, en caso de no\n" \
+        "poder haber una ruta entre dos islas deje la distancia entre si sin llenar.\n" \
+        "Se recomienda tener una lista de las islas y poner una nomenclatura de 3 caracteres para el Mapa.")
         desc.setWordWrap(True)
         layout.addWidget(desc)
         
         # Input area
         input_layout = QHBoxLayout()
         self.vertex_input = QLineEdit()
-        self.vertex_input.setPlaceholderText("Nombre de vértice")
+        self.vertex_input.setPlaceholderText("Nombre de Isla")
         self.vertex_input.setMaximumWidth(120)
         input_layout.addWidget(self.vertex_input)
         
-        add_vertex_btn = QPushButton("Añadir Vértice")
+        add_vertex_btn = QPushButton("Añadir Isla")
         add_vertex_btn.clicked.connect(self.add_vertex)
         add_vertex_btn.setStyleSheet("background-color: #2ecc71; color: white; padding: 8px;")
         input_layout.addWidget(add_vertex_btn)
@@ -233,12 +230,12 @@ class GraphPage(QWidget):
         input_layout.addWidget(self.to_vertex)
         
         self.weight_input = QLineEdit()
-        self.weight_input.setPlaceholderText("Peso")
+        self.weight_input.setPlaceholderText("Distancia")
         self.weight_input.setMaximumWidth(70)
         self.weight_input.setValidator(QIntValidator(1, 9999))
         input_layout.addWidget(self.weight_input)
         
-        add_edge_btn = QPushButton("Añadir Arista")
+        add_edge_btn = QPushButton("Añadir Distancia")
         add_edge_btn.clicked.connect(self.add_edge)
         add_edge_btn.setStyleSheet("background-color: #3498db; color: white; padding: 8px;")
         input_layout.addWidget(add_edge_btn)
@@ -249,17 +246,17 @@ class GraphPage(QWidget):
         # Algorithm buttons
         algo_layout = QHBoxLayout()
         
-        kruskal_btn = QPushButton("▶ Corre algoritmo Kruskal")
+        kruskal_btn = QPushButton("▶ Correr algoritmo de minimización (kruskal)")
         kruskal_btn.clicked.connect(self.run_kruskal)
         kruskal_btn.setStyleSheet("background-color: #9b59b6; color: white; padding: 10px; font-weight: bold;")
         algo_layout.addWidget(kruskal_btn)
         
-        clear_mst_btn = QPushButton("Limpiar")
+        clear_mst_btn = QPushButton("Limpiar primer mapa")
         clear_mst_btn.clicked.connect(self.clear_mst)
         clear_mst_btn.setStyleSheet("background-color: #f39c12; color: white; padding: 10px;")
         algo_layout.addWidget(clear_mst_btn)
         
-        clear_btn = QPushButton("Limpiar todo")
+        clear_btn = QPushButton("Limpiar ambos mapas")
         clear_btn.clicked.connect(self.clear_graph)
         clear_btn.setStyleSheet("background-color: #e74c3c; color: white; padding: 10px;")
         algo_layout.addWidget(clear_btn)
@@ -289,7 +286,7 @@ class GraphPage(QWidget):
         
         mst_scroll = QScrollArea()
         mst_scroll.setWidgetResizable(True)
-        self.mst_canvas = GraphCanvas("Arbol de recorrido mínimo (Kruskal)")
+        self.mst_canvas = GraphCanvas("Mapa de rutas optimas")
         mst_scroll.setWidget(self.mst_canvas)
         mst_layout.addWidget(mst_scroll)
         
@@ -301,7 +298,7 @@ class GraphPage(QWidget):
         layout.addWidget(splitter)
         
         # Info area
-        self.graph_info = QLabel("Grafo vacío | Añada vértices y arístas")
+        self.graph_info = QLabel("Mapa vacío | Añada Islas y Distancias")
         self.graph_info.setStyleSheet("padding: 5px; background-color: #ecf0f1; border-radius: 3px;")
         layout.addWidget(self.graph_info)
         
@@ -311,11 +308,11 @@ class GraphPage(QWidget):
     def add_vertex(self):
         vertex = self.vertex_input.text().strip()
         if not vertex:
-            QMessageBox.warning(self, "Caja vacía", "Añada nombre para el vértice")
+            QMessageBox.warning(self, "Caja vacía", "Añada nombre para la Isla")
             return
         
         if vertex in self.graph:
-            QMessageBox.warning(self, "Duplicado", "Vértice duplicado")
+            QMessageBox.warning(self, "Duplicado", "Nombre de isla duplicado")
             return
         
         self.graph[vertex] = []
@@ -335,18 +332,18 @@ class GraphPage(QWidget):
         try:
             weight = int(weight_str)
             if weight <= 0:
-                QMessageBox.warning(self, "Peso invalido", "Peso debe ser un entero positivo")
+                QMessageBox.warning(self, "Distancia invalida", "Distancia debe ser un entero positivo")
                 return
         except ValueError:
-            QMessageBox.warning(self, "Peso invalido", "Peso debe ser un número entero positivo")
+            QMessageBox.warning(self, "Distancia invalida", "Distancia debe ser un número entero positivo")
             return
         
         if from_v not in self.graph or to_v not in self.graph:
-            QMessageBox.warning(self, "Vértices invalidos", "Ambos vértices deben existir")
+            QMessageBox.warning(self, "Nombres de Isla invalidos", "Ambos Nombres de Isla deben existir")
             return
         
         if any(neighbor == to_v for neighbor, _ in self.graph[from_v]):
-            QMessageBox.warning(self, "Arista duplicados", "Esta arista ya existe")
+            QMessageBox.warning(self, "Distancia entre Islas duplicados", "Esta ruta ya existe")
             return
         
         self.graph[from_v].append((to_v, weight))
@@ -360,8 +357,8 @@ class GraphPage(QWidget):
     
     def run_kruskal(self):
         if len(self.graph) < 2:
-            QMessageBox.warning(self, "Sin vértices suficientes", 
-                              "Se necesitan al menos dos vértices para el algoritmo.")
+            QMessageBox.warning(self, "Sin rutas suficientes", 
+                              "Se necesitan al menos dos rutas para el algoritmo.")
             return
         
         all_edges = []
@@ -375,7 +372,7 @@ class GraphPage(QWidget):
                     all_edges.append((from_v, to_v, weight))
         
         if not all_edges:
-            QMessageBox.warning(self, "Sin artistas", "Grafo sin artistas.")
+            QMessageBox.warning(self, "Sin distancias/rutas", "Mapa sin distancias.")
             return
         
         all_edges.sort(key=lambda x: x[2])

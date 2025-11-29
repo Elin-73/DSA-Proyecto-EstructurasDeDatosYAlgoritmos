@@ -125,38 +125,38 @@ class BinaryTreePage(QWidget):
         
         layout = QVBoxLayout()
         
-        title = QLabel("🌳 Binary Search Tree")
+        title = QLabel("🌳 Árbol Binario")
         title.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         layout.addWidget(title)
         
-        desc = QLabel("A Binary Search Tree where left children are smaller and right children are larger than the parent!")
+        desc = QLabel("Árbol binario gráfico. Ingrese cualquier número para que sea agregado al árbol")
         desc.setWordWrap(True)
         layout.addWidget(desc)
         
         # Input area
         input_layout = QHBoxLayout()
         self.tree_input = QLineEdit()
-        self.tree_input.setPlaceholderText("Enter an integer")
+        self.tree_input.setPlaceholderText("Ingrese entero")
         self.tree_input.setValidator(QIntValidator())
         self.tree_input.setMaximumWidth(150)
         input_layout.addWidget(self.tree_input)
         
-        add_btn = QPushButton("Add Node")
+        add_btn = QPushButton("Añadir valor")
         add_btn.clicked.connect(self.add_node)
         add_btn.setStyleSheet("background-color: #2ecc71; color: white; padding: 10px;")
         input_layout.addWidget(add_btn)
         
-        del_btn = QPushButton("Delete Node")
+        del_btn = QPushButton("Eliminar valor")
         del_btn.clicked.connect(self.del_node)
         del_btn.setStyleSheet("background-color: #e74c3c; color: white; padding: 10px;")
         input_layout.addWidget(del_btn)
         
-        search_btn = QPushButton("Search")
+        search_btn = QPushButton("Buscar valor")
         search_btn.clicked.connect(self.search_node)
         search_btn.setStyleSheet("background-color: #f39c12; color: white; padding: 10px;")
         input_layout.addWidget(search_btn)
         
-        clear_btn = QPushButton("Clear Tree")
+        clear_btn = QPushButton("Limpiar Árbol")
         clear_btn.clicked.connect(self.clear_tree)
         clear_btn.setStyleSheet("background-color: #95a5a6; color: white; padding: 10px;")
         input_layout.addWidget(clear_btn)
@@ -167,22 +167,22 @@ class BinaryTreePage(QWidget):
         # Traversal buttons
         traversal_layout = QHBoxLayout()
         
-        traversal_label = QLabel("Traversals:")
+        traversal_label = QLabel("Traversales:")
         traversal_label.setStyleSheet("font-weight: bold;")
         traversal_layout.addWidget(traversal_label)
         
-        inorder_btn = QPushButton("In-Order")
-        inorder_btn.clicked.connect(lambda: self.show_traversal("in-order"))
+        inorder_btn = QPushButton("In-Orden")
+        inorder_btn.clicked.connect(lambda: self.show_traversal("in-orden"))
         inorder_btn.setStyleSheet("background-color: #3498db; color: white; padding: 8px;")
         traversal_layout.addWidget(inorder_btn)
         
-        preorder_btn = QPushButton("Pre-Order")
-        preorder_btn.clicked.connect(lambda: self.show_traversal("pre-order"))
+        preorder_btn = QPushButton("Pre-Orden")
+        preorder_btn.clicked.connect(lambda: self.show_traversal("pre-orden"))
         preorder_btn.setStyleSheet("background-color: #9b59b6; color: white; padding: 8px;")
         traversal_layout.addWidget(preorder_btn)
         
-        postorder_btn = QPushButton("Post-Order")
-        postorder_btn.clicked.connect(lambda: self.show_traversal("post-order"))
+        postorder_btn = QPushButton("Post-Orden")
+        postorder_btn.clicked.connect(lambda: self.show_traversal("post-orden"))
         postorder_btn.setStyleSheet("background-color: #e67e22; color: white; padding: 8px;")
         traversal_layout.addWidget(postorder_btn)
         
@@ -196,11 +196,11 @@ class BinaryTreePage(QWidget):
         self.tree_canvas = BinaryTreeCanvas()
         scroll.setWidget(self.tree_canvas)
         
-        layout.addWidget(QLabel("Tree Visualization (Green = Root, Blue = Left edges, Red = Right edges):"))
+        layout.addWidget(QLabel("Visualización de Árbol:"))
         layout.addWidget(scroll)
         
         # Info area
-        self.tree_info = QLabel("Tree is empty")
+        self.tree_info = QLabel("Árbol vacío")
         self.tree_info.setStyleSheet("padding: 5px; background-color: #ecf0f1; border-radius: 3px;")
         layout.addWidget(self.tree_info)
         
@@ -210,7 +210,7 @@ class BinaryTreePage(QWidget):
     def add_node(self):
         value = self.tree_input.text().strip()
         if not value:
-            QMessageBox.warning(self, "Empty Input", "Please enter a value")
+            QMessageBox.warning(self, "Valor ingresado vacío", "Introduzca algún número entero")
             return
         
         try:
@@ -219,14 +219,14 @@ class BinaryTreePage(QWidget):
             self.tree_input.clear()
             self.update_display()
         except ValueError:
-            QMessageBox.warning(self, "Invalid Input", "Please enter a valid integer")
+            QMessageBox.warning(self, "Valor inválido", "Ingrese un número entero")
         except Exception as e:
-            QMessageBox.warning(self, "Error", f"Could not add node: {str(e)}")
+            QMessageBox.warning(self, "Error", f"No se pudo agregar: {str(e)}")
 
     def del_node(self):
         value = self.tree_input.text().strip()
         if not value:
-            QMessageBox.warning(self, "Empty Input", "Please enter a value to delete")
+            QMessageBox.warning(self, "Valor vacío", "Ingrese número entero a eliminar")
             return
         
         try:
@@ -234,23 +234,23 @@ class BinaryTreePage(QWidget):
             
             # Check if node exists
             if self.tree.search(self.tree.root, int_value) is None:
-                QMessageBox.warning(self, "Not Found", f"Value {int_value} not found in tree")
+                QMessageBox.warning(self, "No encontrado", f"Valor {int_value} no encontrado en el Árbol")
                 return
             
             self
             self.tree.root = self.tree.delNode(self.tree.root, int_value)
             self.tree_input.clear()
-            QMessageBox.information(self, "Deleted", f"Node {int_value} deleted successfully")
+            QMessageBox.information(self, "Eliminado", f"valor {int_value} eliminado exitosamente")
             self.update_display()
         except ValueError:
-            QMessageBox.warning(self, "Invalid Input", "Please enter a valid integer")
+            QMessageBox.warning(self, "Valor inválido", "Ingrese un número entero")
         except Exception as e:
-            QMessageBox.warning(self, "Error", f"Could not delete node: {str(e)}")
+            QMessageBox.warning(self, "Error", f"No se pudo eliminar el valor: {str(e)}")
     
     def search_node(self):
         value = self.tree_input.text().strip()
         if not value:
-            QMessageBox.warning(self, "Empty Input", "Please enter a value to search")
+            QMessageBox.warning(self, "Valor vacío", "Ingrese número entero a buscar")
             return
         
         try:
@@ -258,37 +258,37 @@ class BinaryTreePage(QWidget):
             result = self.tree.search(self.tree.root, int_value)
             
             if result is not None:
-                QMessageBox.information(self, "Found!", f"✓ Value {int_value} exists in the tree")
+                QMessageBox.information(self, "Encontrado", f"✓ Valor {int_value} existe en el Árbol")
             else:
-                QMessageBox.information(self, "Not Found", f"✗ Value {int_value} was not found in the tree")
+                QMessageBox.information(self, "No encontrado", f"✗ Valor {int_value} no encontrado en el Árbol")
         except ValueError:
-            QMessageBox.warning(self, "Invalid Input", "Please enter a valid integer")
+            QMessageBox.warning(self, "Valor inválido", "Ingrese número entero")
     
     def clear_tree(self):
         self.tree = Tree()
         self.update_display()
-        QMessageBox.information(self, "Cleared", "Tree has been cleared")
+        QMessageBox.information(self, "Podado", "Árbol podado")
     
     def show_traversal(self, order):
         if self.tree.root is None:
-            QMessageBox.information(self, "Empty Tree", "Tree is empty!")
+            QMessageBox.information(self, "Árbol vacío", "El Árbol se encuentra vacío")
             return
         
         result = []
         
-        if order == "in-order":
+        if order == "in-orden":
             self._inorder_collect(self.tree.root, result)
-            description = "Left → Root → Right"
-        elif order == "pre-order":
+            description = "Izquierda → Raíz → Derecho"
+        elif order == "pre-orden":
             self._preorder_collect(self.tree.root, result)
-            description = "Root → Left → Right"
-        elif order == "post-order":
+            description = "Raíz → Izquierda → Derecho"
+        elif order == "post-orden":
             self._postorder_collect(self.tree.root, result)
-            description = "Left → Right → Root"
+            description = "Izquierda → Derecho → Raíz"
         
         result_str = " → ".join(map(str, result))
         QMessageBox.information(self, f"{order.title()} Traversal", 
-                              f"Order: {description}\n\nResult:\n{result_str}")
+                              f"Orden: {description}\n\nResultado:\n{result_str}")
     
     def _inorder_collect(self, node, result):
         if node is None:
@@ -318,7 +318,7 @@ class BinaryTreePage(QWidget):
         actual_node_count = sum(1 for node in nodes if node is not None)
         
         if actual_node_count == 0:
-            self.tree_info.setText("Tree is empty | Add nodes to begin")
+            self.tree_info.setText("Árbol vacío | Añada valores para iniciar")
         else:
             height = self.tree.getHeight(self.tree.root, 0)
-            self.tree_info.setText(f"Nodes: {actual_node_count} | Height: {height}")
+            self.tree_info.setText(f"Nodos: {actual_node_count} | Altura: {height}")
